@@ -53,6 +53,7 @@ EXPRESSIONS = [
     BinaryExpression(Number, Keyword('^'), Number, Number),
     BinaryExpression(Boolean, Keyword('||'), Boolean, Boolean),
     BinaryExpression(Boolean, Keyword('||'), Code, Boolean),
+    BinaryExpression(Array, Keyword('#'), Number, Anything),
     UnaryExpression(Keyword('!'), Boolean, Boolean),
     UnaryExpression(Keyword('+'), Number, Number),
     UnaryExpression(Keyword('+'), Array, Array),

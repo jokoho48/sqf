@@ -58,6 +58,8 @@ EXPRESSIONS = [
     UnaryExpression(Keyword('+'), Number, Number),
     UnaryExpression(Keyword('+'), Array, Array),
     UnaryExpression(Keyword('-'), Number, Number),
+    BinaryExpression(Object, Keyword('ammoonpylon'), String, Boolean),
+    BinaryExpression(Object, Keyword('ammoonpylon'), Number, Boolean),
     UnaryExpression(Keyword('abs'), Number, Number),
     UnaryExpression(Keyword('acos'), Number, Number),
     UnaryExpression(Keyword('actionids'), Object, Array),

@@ -418,8 +418,8 @@ class Analyzer(BaseInterpreter):
                 # when a case is found but we cannot decide on the type, it is anything
                 outcome = Anything()
 
-            extra_scope = None
-            if case_found.keyword in (Keyword('select'), Keyword('apply'), Keyword('count'), Keyword('findif')):
+            extra_scope = {}
+            if case_found.keyword in (Keyword('select'), Keyword('apply'), Keyword('count'), Keyword('findIf')):
                 extra_scope = {'_x': Anything()}
             elif case_found.keyword == Keyword('foreach'):
                 extra_scope = {'_foreachindex': Number(), '_x': Anything()}
@@ -427,10 +427,11 @@ class Analyzer(BaseInterpreter):
                 extra_scope = {'_exception': Anything()}
             elif case_found.keyword == Keyword('spawn'):
                 extra_scope = {'_thisScript': Script(), '_this': values[0]}
-            elif case_found.keyword == Keyword('addEventhandler'):
-                extra_scope = {'_thisEventHandler': Number()}
             elif case_found.keyword == Keyword('do') and type(values[0]) == ForType:
                 extra_scope = {values[0].variable.value: Number()}
+            extra_scope['_thisEventHandler'] = Number()
+            extra_scope['_x'] = Anything()
+
             for value, t_or_v in zip(values, case_found.types_or_values):
                 # execute all pieces of code
                 if t_or_v == Code and isinstance(value, Code) and self.code_key(value) not in self._executed_codes:

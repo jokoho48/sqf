@@ -49,10 +49,14 @@ def get_lbp(token):
         return 6
     elif n_token == 'else':
         return 5
+    elif n_token == '^':  # it is a binary, but it has higher precedence
+        return 8
     elif n_token in BINARY_OPERATORS:
         return 4
-    elif n_token in UNARY_OPERATORS:
+    elif n_token == '#':
         return 9
+    elif n_token in UNARY_OPERATORS:
+        return 10
     else:
         return 0.1
 

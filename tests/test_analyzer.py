@@ -994,6 +994,11 @@ class SpecialContext(TestCase):
         analyzer = analyze(parse(code))
         self.assertEqual(analyzer.exceptions, [])
 
+    def test_findif(self):
+        code = '[unit1, unit2, unit3] findIf {not alive _x};'
+        analyzer = analyze(parse(code))
+        self.assertEqual(analyzer.exceptions, [])
+
     def test_try_catch(self):
         code = 'try {hint _x} catch {hint _y; hint str _exception}'
         analyzer = analyze(parse(code))
@@ -1032,6 +1037,15 @@ class SpecialContext(TestCase):
         analyzer = analyze(parse(code))
         errors = analyzer.exceptions
         self.assertEqual(len(errors), 1)
+
+    def test_hash(self):
+        code = 'x # 2'
+        analyzer = analyze(parse(code))
+        self.assertEqual(len(analyzer.exceptions), 0)
+
+        code = 'x # {_x == 2}'
+        analyzer = analyze(parse(code))
+        self.assertEqual(len(analyzer.exceptions), 2)
 
     def test_code_not_executed_in_loop(self):
         code = '{if ((_x select 0) == r && {(_x select 1) == r}) exitWith {};} forEach t;'

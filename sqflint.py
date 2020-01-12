@@ -46,7 +46,6 @@ def analyze_dir(directory, writer, exceptions_list, exclude):
                     continue
 
                 writer_helper = Writer()
-
                 with open(file_path) as f:
                     analyze(f.read(), writer_helper, exceptions_list)
 
@@ -88,8 +87,7 @@ def entry_point(args):
     if args.output is None:
         writer = sys.stdout
     else:
-        writer = args.output
-
+        writer = Logger(args.output)
     exceptions_list = []
 
     if args.file is None and args.directory is None:
@@ -120,6 +118,24 @@ def entry_point(args):
 def main():
     sys.exit(entry_point(sys.argv[1:]))
 
+class Logger:
+    def __init__(self, file):
+        self.terminal = sys.stdout
+        self.log = file
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        #this flush method is needed for python 3 compatibility.
+        #this handles the flush command by doing nothing.
+        #you might want to specify some extra behavior here.
+        pass
+
+    def close(self):
+        self.log.close()
+        self.terminal.close()
 
 if __name__ == "__main__":
     main()

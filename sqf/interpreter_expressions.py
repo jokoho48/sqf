@@ -280,7 +280,8 @@ def execute_switch(interpreter, result, conditions):
 def _foreach_loop(interpreter, code, elements):
     outcome = Nothing()
     for i, x in enumerate(elements):
-        outcome = interpreter.execute_code(code, extra_scope={'_x': x, '_forEachIndex': Number(i)})
+        outcome = interpreter.execute_code(
+            code, extra_scope={'_x': x, '_X': x, '_forEachIndex': Number(i)})
     return outcome
 
 

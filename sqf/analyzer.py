@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from sqf.types import Statement, Code, Nothing, Variable, Array, String, Type, File, BaseType, \
+from sqf.types import Statement, Code, Nothing, Variable, Array, String, Type, File, BaseType, Namespace, \
     Number, Preprocessor, Script, Anything
 from sqf.interpreter_types import InterpreterType, PrivateType, ForType, SwitchType, \
     DefineStatement, DefineResult, IfDefResult
@@ -262,7 +262,10 @@ class Analyzer(BaseInterpreter):
         elif lhs_t != rhs_t and self.delete_scope_level >= scope.level:
             rhs_t = Anything
 
-        scope[lhs_name] = rhs_t()
+        if (rhs_t == Namespace):
+            scope[lhs_name] = rhs_t(lhs_name)
+        else:
+            scope[lhs_name] = rhs_t()
 
         if scope.level == 0 and lhs_name.startswith('_'):
             self.exception(

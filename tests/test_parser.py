@@ -97,7 +97,7 @@ class TestExpParser(TestCase):
 
 
 class ParserTestCase(TestCase):
-    
+
     def assertEqualStatement(self, expected, result, code):
         self.assertEqual(expected, result)
         self.assertEqual(code, str(result))
@@ -202,7 +202,7 @@ class ParseCode(ParserTestCase):
         result = parse(code)
         expected = Statement([Statement([
             Statement([V('_x'), Keyword('='), String('"AirS"')], ending=';')], parenthesis=True)])
-        
+
         self.assertEqualStatement(expected, result, code)
 
         code = '(_x="AirS";);'
@@ -336,7 +336,7 @@ class ParseCode(ParserTestCase):
         result = parse(code)
         expected = Statement([Statement([V('_is1'), Keyword('='),
                                          Code([Statement([V('_x'), Keyword('=='), N(1)])])], ending=';')])
-        
+
         self.assertEqualStatement(expected, result, code)
 
     def test_signed_precedence(self):
@@ -1074,7 +1074,6 @@ class ParsePreprocessor(ParserTestCase):
             ])
         self.assertEqualStatement(expected, parse(code), code)
 
-
 class TestIfDefStatement(ParserTestCase):
 
     def test_basic(self):
@@ -1444,6 +1443,36 @@ class TestDefineStatement(ParserTestCase):
             ])
         self.assertEqualStatement(expected, result, code)
 
+    def test_stringify_identification(self):
+        # hash should be preprocessor in a define statement
+        # considered as a keyword otherwise
+        code = '#define QUOTE(A) #A\n[0]#0'
+        result = parse(code)
+        expected = Statement([
+            Statement([
+                DefineStatement([
+                        Preprocessor('#define'), Space(), V('QUOTE'),
+                        Statement([
+                            Statement([V('A')])
+                        ], parenthesis=True),
+                        Space(), Preprocessor('#'), V('A')
+                    ],
+                    variable_name='QUOTE',
+                    expression=[Preprocessor('#'), V('A')],
+                    args=['A']
+                )
+            ]),
+            Statement([
+                Statement([
+                    EndOfLine('\n'), Array([Statement([N(0)])])
+                ]),
+                Keyword('#'), N(0)
+            ])
+        ])
+        self.assertEqualStatement(expected, result, code)
+
+
+
 
 class TestDefineResult(ParserTestCase):
 
@@ -1686,3 +1715,110 @@ class TestDefineResult(ParserTestCase):
             ])
 
         self.assertEqualStatement(expected, result, code)
+
+    def test_stringify_static(self):
+        define = parse('#define A #quoteMe')[0][0]
+
+        # the code with the define
+        code = str(Statement([define])) + '\nA'
+
+        result = parse(code)
+
+        expected_statement = Statement([
+            Statement([EndOfLine('\n'), String('"quoteMe"')])
+        ])
+
+        expected = \
+            Statement([
+                Statement([define]),
+                DefineResult([EndOfLine('\n'), V('A')],
+                             define, expected_statement)
+            ])
+
+        self.assertEqualStatement(expected, result, code)
+
+    def test_concatenate_static(self):
+        define = parse('#define gvar global##Var')[0][0]
+
+        code = str(Statement([define])) + '\ngvar'
+
+        result = parse(code)
+
+        expected_statement = Statement([
+            Statement([EndOfLine('\n'), V('globalVar')])
+        ])
+
+        expected = \
+            Statement([
+                Statement([define]),
+                DefineResult([EndOfLine('\n'), V('gvar')],
+                             define, expected_statement)
+            ])
+
+        self.assertEqualStatement(expected, result, code)
+
+    def test_combined_concat_stringify(self):
+        define = parse('#define ConS(var1,var2) #var1###var2')[0][0]
+
+        code = str(Statement([define])) + '\nConS(a,b)'
+
+        result = parse(code)
+
+        expected_statement = Statement([
+            Statement([EndOfLine('\n'), String('"a""b"')])
+        ])
+
+        expected = \
+            Statement([
+                Statement([define]),
+                DefineResult([EndOfLine('\n'), V('ConS'), ParserKeyword('('), V('a'), ParserKeyword(','), V('b'), ParserKeyword(')')],
+                             define, expected_statement)
+            ])
+
+        self.assertEqualStatement(expected, result, code)
+
+    # Commented out the following test temporarily as the parser won't handle
+    # an odd number of quotation marks (however, this doesn't actually error in-game, but maybe it should for the parser?)
+
+    # def test_stringify_odd_num_quotes(self):
+    #     # Passing in *any* string with an odd number of quotes produces an empty quote
+    #     define = parse('#define QUOTE(var) #var')[0][0]
+
+    #     code = str(Statement([define])) + '\nQUOTE(")\nQUOTE(""")\nQUOTE(""""")'
+
+    #     result = parse(code)
+
+    #     expected_statement = Statement([
+    #         Statement([EndOfLine('\n'), String('""')])
+    #     ])
+
+    #     expected = \
+    #         Statement([
+    #             Statement([define]),
+    #             DefineResult([EndOfLine('\n'), V('QUOTE'), ParserKeyword('('), , ParserKeyword(')')],
+    #                          define, expected_statement),
+    #             DefineResult([EndOfLine('\n'), V('QUOTE'), ParserKeyword('('), , ParserKeyword(')')],
+    #                          define, expected_statement),
+    #             DefineResult([EndOfLine('\n'), V('QUOTE'), ParserKeyword('('), , ParserKeyword(')')],
+    #                          define, expected_statement)
+    #         ])
+
+    #     self.assertEqualStatement(expected, result, code)
+
+
+
+
+    # ===== For future tests =====
+    # "concat"##"strings" <- Should error ## outside of define
+    # #stringify <- Should error (# considered as sqf keyword outside of define)
+    # #define A #!?;\'' \n A <- Should error, invalid token following #
+    # #define test(index) [0,1,2] # index \n test <- Should error, invalid token following #
+    # #define CON(var1,var2) var1 ## var2 \n CON(1,2) <- should error for analyzer/interpreter (missing ;)
+
+    # #define QUOTE(v1) #v1 \n QUOTE(!?;\'') <- Valid, symbols passed in as variable
+    # #define QUOTE(v1) #v1 \n QUOTE( ) <- Valid, space passed in as variable
+    # #define QUOTE(v1) #v1 \n QUOTE(()) <- Works as expected
+    # #define QUOTE(v1) #v1 \n QUOTE()) <- Can't use a right bracket on it's own, error
+    # #define QUOTE(v1) #v1 \n QUOTE(() <- This produces an empty quote
+
+    # #define CON(v1,v2) v1##v2 \n CON(","); <- Silently resolves to nothing (not an empty quote as expected)

@@ -393,7 +393,7 @@ class Analyzer(BaseInterpreter):
                 if case_found.keyword == Keyword('isnil') and type(values[1]) == String or \
                    case_found.keyword == Keyword('configClasses'):
                     code_position = {'isnil': 1, 'configclasses': 0}[case_found.keyword.unique_token]
-                    extra_scope = {'isnil': None, 'configclasses': {'_x': Anything()}}[case_found.keyword.unique_token]
+                    extra_scope = {'isnil': None, 'configclasses': {'_x': Anything(), '_X': Anything()}}[case_found.keyword.unique_token]
 
                     # when the string is undefined, there is no need to evaluate it.
                     if not values[code_position].is_undefined:
@@ -422,6 +422,9 @@ class Analyzer(BaseInterpreter):
                 outcome = Anything()
 
             extra_scope = {}
+            extra_scope['_thisEventHandler'] = Number()
+            extra_scope['_x'] = Anything()
+            extra_scope['_X'] = Anything()
             if case_found.keyword in (Keyword('select'), Keyword('apply'), Keyword('count'), Keyword('findIf')):
                 extra_scope = {'_x': Anything(), '_X': Anything()}
             elif case_found.keyword == Keyword('foreach'):
@@ -432,9 +435,7 @@ class Analyzer(BaseInterpreter):
                 extra_scope = {'_thisScript': Script(), '_this': values[0]}
             elif case_found.keyword == Keyword('do') and type(values[0]) == ForType:
                 extra_scope = {values[0].variable.value: Number()}
-            extra_scope['_thisEventHandler'] = Number()
-            extra_scope['_x'] = Anything()
-            extra_scope['_X'] = Anything()
+
 
             for value, t_or_v in zip(values, case_found.types_or_values):
                 # execute all pieces of code

@@ -91,7 +91,7 @@ def _parse_return_type_names(return_type_names):
     return STRING_TO_TYPE_RETURN[return_type_name]
 
 
-url = 'https://raw.githubusercontent.com/intercept/intercept/74d3d0d3639176488eba94fe091edfbcff9de10e/src/client/headers/client/sqf_pointers_declaration.hpp'
+url = 'https://raw.githubusercontent.com/intercept/intercept/master/src/client/headers/client/sqf_pointers_declaration.hpp'
 data = urllib.request.urlopen(url).read().decode('utf-8').split('\n')
 
 

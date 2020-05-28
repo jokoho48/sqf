@@ -426,16 +426,19 @@ class Analyzer(BaseInterpreter):
             extra_scope['_x'] = Anything()
             extra_scope['_X'] = Anything()
             if case_found.keyword in (Keyword('select'), Keyword('apply'), Keyword('count'), Keyword('findIf')):
-                extra_scope = {'_x': Anything(), '_X': Anything()}
+                extra_scope['_x'] = Anything()
+                extra_scope['_X'] = Anything()
             elif case_found.keyword == Keyword('foreach'):
-                extra_scope = {'_foreachindex': Number(), '_x': Anything(), '_X': Anything()}
+                extra_scope['_x'] = Anything()
+                extra_scope['_X'] = Anything()
+                extra_scope['_foreachindex'] = Number()
             elif case_found.keyword == Keyword('catch'):
-                extra_scope = {'_exception': Anything()}
+                extra_scope['_exception'] = Anything()
             elif case_found.keyword == Keyword('spawn'):
-                extra_scope = {'_thisScript': Script(), '_this': values[0]}
+                extra_scope['_thisScript'] = Script()
+                extra_scope['_this'] = values[0]
             elif case_found.keyword == Keyword('do') and type(values[0]) == ForType:
-                extra_scope = {values[0].variable.value: Number()}
-
+                extra_scope[values[0].variable.value] = Number()
 
             for value, t_or_v in zip(values, case_found.types_or_values):
                 # execute all pieces of code

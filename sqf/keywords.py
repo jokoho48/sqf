@@ -36,7 +36,7 @@ OP_LOGICAL = [Keyword(s) for s in ('&&', 'and', '||', 'or')]
 
 OP_COMPARISON = [Keyword(s) for s in ('==', 'isequalto', '!=', '<', '>', '<=', '>=', '>>')]
 
-NAMESPACES = {'missionnamespace', 'profilenamespace', 'uinamespace', 'parsingnamespace'}
+NAMESPACES = {'missionnamespace', 'profilenamespace', 'uinamespace', 'parsingnamespace', 'localnamespace'}
 
 # namespaces are parsed as such
 KEYWORDS = KEYWORDS - NAMESPACES

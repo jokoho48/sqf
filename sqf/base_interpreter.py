@@ -15,7 +15,8 @@ class BaseInterpreter:
             'uinamespace': sqf.namespace.Namespace('uinamespace'),
             'parsingnamespace': sqf.namespace.Namespace('parsingnamespace'),
             'missionnamespace': sqf.namespace.Namespace('missionnamespace', all_vars),
-            'profilenamespace': sqf.namespace.Namespace('profilenamespace')
+            'profilenamespace': sqf.namespace.Namespace('profilenamespace'),
+            'localnamespace': sqf.namespace.Namespace('localnamespac')
         }
 
         self.current_namespace = self.namespace('missionnamespace')

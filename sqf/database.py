@@ -8,6 +8,7 @@ from sqf.interpreter_types import WhileType, \
 
 EXPRESSIONS = [
     BinaryExpression(Array, Keyword('#'), Number, Anything),
+    BinaryExpression(Number, Keyword('!='), Boolean, Boolean),
     BinaryExpression(Number, Keyword('!='), Number, Boolean),
     BinaryExpression(String, Keyword('!='), String, Boolean),
     BinaryExpression(Object, Keyword('!='), Object, Boolean),

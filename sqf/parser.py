@@ -73,23 +73,48 @@ def identify_token(token):
         return Variable(token)
 
 
+def preprocessor_stringify(token, is_variable):
+    # Verify that token starts with appropriate char and is alphanumeric
+    if not (is_variable or re.match(r'[a-zA-Z_]\w*', str(token))):
+        # todo: need to fix the coordinates for errors here
+        raise SQFParserError(get_coord(""), 'Stringification failed on invalid characters')
+
+    # todo: check for invalid string created (missing ")
+    return String("\"" + str(token) + "\"")
+
 def replace_in_expression(expression, args, arg_indexes, all_tokens):
     """
     Recursively replaces matches of `args` in expression (a list of Types).
     """
     replacing_expression = []
+    commands = {'#': False, '##': False}
     for token in expression:
+        if token in (Preprocessor('#'), Preprocessor('##')):
+            commands[token.value] = True
+            continue
+
         if isinstance(token, Statement):
             new_expression = replace_in_expression(token.content, args, arg_indexes, all_tokens)
-            token = Statement(new_expression, ending=token.ending, parenthesis=token.parenthesis)
-            replacing_expression.append(token)
+            new_token = Statement(new_expression, ending=token.ending, parenthesis=token.parenthesis)
         else:
             for arg, arg_index in zip(args, arg_indexes):
                 if str(token) == arg:
-                    replacing_expression.append(all_tokens[arg_index])
+                    new_token = all_tokens[arg_index]
                     break
             else:
-                replacing_expression.append(token)
+                new_token = token
+
+            if commands['#']:
+                new_token = preprocessor_stringify(new_token, is_variable=new_token != token)
+                commands['#'] = False
+
+        replacing_expression.append(new_token)
+
+    if commands['##']:
+        # re-parse whole statement if concatenation occured
+        # todo: any errors will report wrong coordinate
+        replacing_expression = parse("".join([str(t) for t in replacing_expression])).tokens
+
     return replacing_expression
 
 
@@ -487,7 +512,6 @@ def parse_block(all_tokens, analyze_tokens, start=0, initial_lvls=None, stop_sta
             lvls['{}'] -= 1
             tokens.append(expression)
             i += size + 1
-
         elif token == ParserKeyword(']'):
             if lvls['[]'] == 0:
                 raise SQFParenthesisError(get_coord(all_tokens[:i]), 'Trying to close right parenthesis without them opened.')
@@ -537,6 +561,9 @@ def parse_block(all_tokens, analyze_tokens, start=0, initial_lvls=None, stop_sta
 
             statements.append(expression)
             i += size
+        elif token == Keyword('#') and lvls['#define'] != 0:
+            # The # sqf command is superseded by the preprocessor directive's stringification command
+            tokens.append(Preprocessor('#'))
         elif type(token) in (EndOfLine, Comment, EndOfFile) and any(lvls[x] != 0 for x in {'#define', '#include'}):
             tokens.insert(0, all_tokens[start - 1])  # pick the token that triggered the statement
             if tokens[0] == Preprocessor('#define'):

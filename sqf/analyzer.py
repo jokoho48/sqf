@@ -360,10 +360,14 @@ class Analyzer(BaseInterpreter):
             if isinstance(base_tokens[1].base_tokens[0], Statement):
                 sub_tokens = base_tokens[1].base_tokens[0].base_tokens
             else:
-                sub_tokens = base_tokens[1]
-            for sub_token in sub_tokens:
-                self.value(sub_token)
-
+                sub_tokens = base_tokens[0]
+            
+            
+            if isinstance(sub_tokens, Variable):
+                self.value(sub_tokens)
+            else:
+                for sub_token in sub_tokens:
+                    self.value(sub_token)
             # finally, build the outcome
             outcome = Anything()
             outcome.position = base_tokens[0].position

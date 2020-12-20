@@ -360,7 +360,7 @@ class Analyzer(BaseInterpreter):
             if isinstance(base_tokens[1].base_tokens[0], Statement):
                 sub_tokens = base_tokens[1].base_tokens[0].base_tokens
             else:
-                sub_tokens = base_tokens[0]
+                sub_tokens = base_tokens[1]
             for sub_token in sub_tokens:
                 self.value(sub_token)
 

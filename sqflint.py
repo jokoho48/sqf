@@ -46,7 +46,7 @@ def analyze_dir(directory, writer, exceptions_list, exclude):
                     continue
 
                 writer_helper = Writer()
-                with open(file_path) as f:
+                with open(file_path, 'r', -1 ,'utf8') as f:
                     analyze(f.read(), writer_helper, exceptions_list)
 
                 if writer_helper.strings:

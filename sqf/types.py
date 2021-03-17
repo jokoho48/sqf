@@ -437,3 +437,6 @@ class DiaryReport(ConstantValue):
 
 class TeamMember(ConstantValue):
     pass
+
+class HashMap(Array):
+    pass

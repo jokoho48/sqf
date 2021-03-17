@@ -8,7 +8,7 @@ import urllib.request
 
 from sqf.interpreter_types import ForType, IfType, SwitchType, WhileType, TryType, WithType
 from sqf.types import Code, Array, Boolean, Number, Type, Nothing, Anything, String, Namespace, \
-    Object, Config, Script, Control, Group, Display, Side, Task, Location, NetObject, DiaryReport, TeamMember
+    Object, Config, Script, Control, Group, Display, Side, Task, Location, NetObject, DiaryReport, TeamMember, HashMap
 
 
 # The mapping of SQF types to our types
@@ -40,7 +40,8 @@ STRING_TO_TYPE = {
     'nothing': Nothing,
     'netobject': NetObject,
     'any': Type,
-    'diary': DiaryReport  # diary_record gets split
+    'diary': DiaryReport,  # diary_record gets split
+    'hashmap': HashMap
 }
 
 # the argument the type is initialized with
@@ -91,9 +92,10 @@ def _parse_return_type_names(return_type_names):
     return STRING_TO_TYPE_RETURN[return_type_name]
 
 
-url = 'https://raw.githubusercontent.com/intercept/intercept/master/src/client/headers/client/sqf_pointers_declaration.hpp'
-data = urllib.request.urlopen(url).read().decode('utf-8').split('\n')
+# url = 'https://raw.githubusercontent.com/intercept/intercept/master/src/client/headers/client/sqf_pointers_declaration.hpp'
+# data = urllib.request.urlopen(url).read().decode('utf-8').split('\n')
 
+data = open('sqf_pointers_declaration.hpp', 'r').read().split('\n')
 
 expressions = []
 for line in data:
@@ -170,7 +172,7 @@ for line in data:
 preamble = r'''# This file is generated automatically by `build_database.py`. Change it there.
 from sqf.expressions import BinaryExpression, UnaryExpression, NullExpression
 from sqf.types import Keyword, Type, Nothing, Anything, String, Code, Array, Number, Boolean, Namespace, \
-    Object, Config, Script, Control, Group, Display, Side, Task, Location, NetObject, DiaryReport, TeamMember
+    Object, Config, Script, Control, Group, Display, Side, Task, Location, NetObject, DiaryReport, TeamMember, HashMap
 from sqf.interpreter_types import WhileType, \
     ForType, SwitchType, IfType, TryType, WithType'''
 
@@ -233,6 +235,31 @@ EXPRESSIONS = [
     UnaryExpression(Keyword('-'), Number, Number),
     BinaryExpression(Object, Keyword('ammoonpylon'), String, Boolean),
     BinaryExpression(Object, Keyword('ammoonpylon'), Number, Boolean),
+    BinaryExpression(HashMap, Keyword('deleteat'), Side, Anything), 
+    BinaryExpression(HashMap, Keyword('deleteat'), Config, Anything), 
+    BinaryExpression(HashMap, Keyword('deleteat'), String, Anything),
+    BinaryExpression(HashMap, Keyword('deleteat'), Number, Anything),
+    BinaryExpression(HashMap, Keyword('deleteat'), Boolean, Anything),
+    BinaryExpression(HashMap, Keyword('deleteat'), Array, Anything),
+    BinaryExpression(HashMap, Keyword('deleteat'), Code, Anything),
+    BinaryExpression(HashMap, Keyword('deleteat'), Namespace, Anything),
+    BinaryExpression(HashMap, Keyword('get'), Side, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), Config, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), String, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), Number, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), Boolean, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), Array, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), Code, Anything), 
+    BinaryExpression(HashMap, Keyword('get'), Namespace, Anything), 
+    BinaryExpression(Side, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(Config, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(String, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(Number, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(Boolean, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(Array, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(Code, Keyword('in'), HashMap, Boolean), 
+    BinaryExpression(Namespace, Keyword('in'), HashMap, Boolean), 
+
 '''
 
 

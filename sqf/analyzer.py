@@ -435,6 +435,8 @@ class Analyzer(BaseInterpreter):
             elif case_found.keyword == Keyword('foreach'):
                 extra_scope['_x'] = Anything()
                 extra_scope['_X'] = Anything()
+                extra_scope['_y'] = Anything()
+                extra_scope['_Y'] = Anything()
                 extra_scope['_foreachindex'] = Number()
             elif case_found.keyword == Keyword('catch'):
                 extra_scope['_exception'] = Anything()

@@ -34,11 +34,11 @@ OP_ARITHMETIC = [Keyword(s) for s in ('+', '-', '*', '/', '%', 'mod', '^', 'max'
 
 OP_LOGICAL = [Keyword(s) for s in ('&&', 'and', '||', 'or')]
 
-OP_COMPARISON = [Keyword(s) for s in ('==', 'isequalto', '!=', '<', '>', '<=', '>=', '>>')]
+OP_COMPARISON = [Keyword(s) for s in ('==', 'isequalto', '!=', '<', '>', '<=', '>=', '>>', 'isnotequalto')]
 
 NAMESPACES = {'missionnamespace', 'profilenamespace', 'uinamespace', 'parsingnamespace', 'localnamespace'}
 
 # namespaces are parsed as such
 KEYWORDS = KEYWORDS - NAMESPACES
 
-UNARY_OPERATORS.union({'#ifdef', '#ifndef', '#include'})
+UNARY_OPERATORS.union({'#ifdef', '#ifndef', '#include', '#if'})

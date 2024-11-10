@@ -233,6 +233,7 @@ EXPRESSIONS = [
     UnaryExpression(Keyword('+'), Number, Number),
     UnaryExpression(Keyword('+'), Array, Array),
     UnaryExpression(Keyword('-'), Number, Number),
+    UnaryExpression(Keyword('getunitstate'), Object, String),
     BinaryExpression(Object, Keyword('ammoonpylon'), String, Boolean),
     BinaryExpression(Object, Keyword('ammoonpylon'), Number, Boolean),
     BinaryExpression(HashMap, Keyword('deleteat'), Side, Anything), 
